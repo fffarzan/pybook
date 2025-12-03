@@ -1,16 +1,19 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404, render
 
 from .models import Book
 
 def index(request):
-    books = Book.objects.all()
+    books = Book.objects.all().order_by('-rating')
 
     return render(request, 'book_outlet/index.html', {
-        'books': books
+        'books': books,
+        'num_books': books.count(),
+        'avg_rating': books.aggregate(Avg('rating'))
     })
 
-def book_detail(request, id):
-    book = get_object_or_404(Book, pk=id)
+def book_detail(request, slug):
+    book = get_object_or_404(Book, slug=slug)
 
     return render(request, 'book_outlet/book_detail.html', {
         'title': book.title,
